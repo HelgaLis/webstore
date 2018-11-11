@@ -5,6 +5,7 @@ import java.sql.SQLException;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.RowMapper;
@@ -49,6 +50,20 @@ public class InMemoryProductRepository implements ProductRepository {
 		params.put("id", productId);
 		jdbcTemplate.update(SQL, params);
 		
+	}
+	@Override
+	public List<Product> getProductsByCategory(String category) {
+		String sql = "SELECT * FROM PRODUCTS WHERE CATEGORY = :category";
+		Map<String, Object> params = new HashMap<>();
+		params.put("category", category);
+		return jdbcTemplate.query(sql, params, new ProductMapper());
+	}
+	@Override
+	public List<String> getAllProductCategories() {
+		String sql = "SELECT DISTINCT * FROM products";
+		Map<String, Object> params = new HashMap<>();
+		List<Product> cats = jdbcTemplate.query(sql, params, new ProductMapper());
+		return cats.stream().map(p->p.getCategory()).collect(Collectors.toList());
 	}
 
 }
