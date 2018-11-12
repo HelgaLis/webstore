@@ -21,19 +21,20 @@
 	</section>
 	<section class="container">
 		<div class="row">
-		<c:forEach var="clip" items="${products}" >
+
 			<div class="col-sm-6 col-md-3" style="padding-bottom: 15px">
 				<div class="thumbnail">
 					<div class="caption">
-					<h3>${clip.name}</h3>
-					<p>${clip.description}</p>
-					<p>Available units ${clip.unitsInStock}</p>
-					<p><a href="<spring:url value="/market/product?id=${clip.productId}"/>"> Details </a>
+					<h3>${product.name}</h3>
+					<p>${product.description}</p>
+					<p>Available units ${product.unitsInStock}</p>
+						<p>${product.manufacturer}</p>
+							<p>${product.category}</p>
+							<p><a href="<spring:url value="/market/products"/>"> Back </a>
 					</p>
 					</div>
 				</div>
 			</div>
-			</c:forEach>
 		</div>
 	</section>
 </body>

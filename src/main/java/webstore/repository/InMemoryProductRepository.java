@@ -65,5 +65,29 @@ public class InMemoryProductRepository implements ProductRepository {
 		List<Product> cats = jdbcTemplate.query(sql, params, new ProductMapper());
 		return cats.stream().map(p->p.getCategory()).collect(Collectors.toList());
 	}
+	@Override
+	public List<Product> getPruductByFilter(
+			Map<String, List<String>> filterParams) {
+		String sql = "SELECT * FROM Products WHERE CATEGORY in (:categories) AND MANUFACTURER IN (:brands)";
+		
+		return jdbcTemplate.query(sql, filterParams, new ProductMapper());
+	}
+	@Override
+	public Product getProductById(String productId) {
+		String sql = "SELECT * FROM Products WHERE ID=:id";
+		Map<String, Object> params = new HashMap<String, Object>();
+		params.put("id", productId);
+		return jdbcTemplate.queryForObject(sql, params, new ProductMapper());
+	}
+	@Override
+	public List<Product> filterProducts(Map<String, Double> priceParams,
+			String category, String brand) {
+		String sql = "SELECT * FROM Products WHERE CATEGORY=:category AND MANUFACTURER=:brand AND UNIT_PRICE BEETWEEN :low AND :high";
+		Map<String, Object> params = new HashMap<String, Object>();
+		params.put("category", category);
+		params.put("brand", brand);
+		params.putAll(priceParams);
+		return jdbcTemplate.query(sql, params, new ProductMapper());
+	}
 
 }
