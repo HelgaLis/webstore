@@ -6,4 +6,5 @@ import webstore.domain.Customer;
 
 public interface CustomerRepository {
 	public List<Customer> getAllCustomers();
+	public void addCustomer(Customer customer);
 }

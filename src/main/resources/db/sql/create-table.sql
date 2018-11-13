@@ -1,3 +1,4 @@
+
 drop table products if exists;
 
 create table products(

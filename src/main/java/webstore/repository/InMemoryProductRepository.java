@@ -89,5 +89,24 @@ public class InMemoryProductRepository implements ProductRepository {
 		params.putAll(priceParams);
 		return jdbcTemplate.query(sql, params, new ProductMapper());
 	}
+	@Override
+	public void addProduct(Product product) {
+		String sql = "INSERT INTO Products (ID, NAME, DESCRIPTION, UNIT_PRICE, MANUFACTURER, CATEGORY, CONDITION, UNITS_IN_STOCK, UNITS_IN_ORDER, DISCONTINUED)"
+				+" VALUES(:id,:name,:desc,:price,:manufacturer,:category,:condition,:inStock,:inOrder,:discontinued)";
+		System.out.println(product);
+		Map<String, Object> params = new HashMap<String, Object>();
+		params.put("id", product.getProductId());
+		params.put("name", product.getName());
+		params.put("desc", product.getDescription());
+		params.put("price", product.getUnitPrice());
+		params.put("manufacturer", product.getManufacturer());
+		params.put("category", product.getCategory());
+		params.put("condition", product.getCondition());
+		params.put("inStock", product.getUnitsInStock());
+		params.put("inOrder", product.getUnitsInOrder());
+		params.put("discontinued", product.isDiscontinued());
+		jdbcTemplate.update(sql, params);
+		
+	}
 
 }

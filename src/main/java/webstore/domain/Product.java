@@ -110,6 +110,18 @@ public class Product implements Serializable {
 			return false;
 		return true;
 	}
+	/* (non-Javadoc)
+	 * @see java.lang.Object#toString()
+	 */
+	@Override
+	public String toString() {
+		return "Product [productId=" + productId + ", name=" + name
+				+ ", unitPrice=" + unitPrice + ", description=" + description
+				+ ", manufacturer=" + manufacturer + ", category=" + category
+				+ ", unitsInStock=" + unitsInStock + ", unitsInOrder="
+				+ unitsInOrder + ", discontinued=" + discontinued
+				+ ", condition=" + condition + "]";
+	}
 	
 	
 

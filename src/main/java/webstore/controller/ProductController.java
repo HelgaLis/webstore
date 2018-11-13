@@ -8,11 +8,18 @@ import java.util.Map;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
+import org.springframework.util.StringUtils;
+import org.springframework.validation.BindingResult;
+import org.springframework.web.bind.WebDataBinder;
+import org.springframework.web.bind.annotation.InitBinder;
 import org.springframework.web.bind.annotation.MatrixVariable;
+import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 
+import webstore.domain.Product;
 import webstore.service.ProductService;
 
 @Controller
@@ -20,6 +27,10 @@ import webstore.service.ProductService;
 public class ProductController {
 	@Autowired
 	private ProductService productService;
+	@InitBinder
+	public void initializeBinder(WebDataBinder binder){
+		binder.setAllowedFields("productId","name","unitPrice","description","category","unitsInStock","condition");
+	}
 	@RequestMapping("/products")
 	public String list(Model model) {
 		/*Product product = new Product("P1234","Ihpone6s",new BigDecimal(500));
@@ -61,5 +72,19 @@ public class ProductController {
 			@MatrixVariable(pathVar="price") Map<String,String> priceParams, Model model){
 		
 		return "product";
+	}
+	@RequestMapping(value="/products/add", method=RequestMethod.GET)
+	public String adddNewProductForm(Model model){
+		Product newProduct = new Product();
+		model.addAttribute("newProduct", newProduct);
+		return "addProduct";
+	}
+	@RequestMapping(value="/products/add",method=RequestMethod.POST)
+	public String processAddNewProduct(@ModelAttribute("newProduct") Product newProduct, BindingResult result){
+		if(result.getSuppressedFields().length>0){
+			throw new RuntimeException(StringUtils.arrayToCommaDelimitedString(result.getSuppressedFields()));
+		}
+		productService.addProduct(newProduct);
+		return "redirect:/market/products";
 	}
 }
