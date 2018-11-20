@@ -17,7 +17,23 @@
   <configuration>
   <failOnMissingWebXml>false</failOnMissingWebXml>
   </configuration>
-  </plugin>
+</plugin>
+    <plugin>
+    <groupId>org.eclipse.jetty</groupId>
+    <artifactId>jetty-maven-plugin</artifactId>
+    <version>9.4.12.v20180830</version>
+    	 <configuration>
+  <useTestScope>true</useTestScope>
+  <stopPort>8005</stopPort>
+  <stopKey>DIE!</stopKey>
+  <systemProperties>
+  <systemProperty>
+  <name>jetty.port</name>
+  <value>8080</value>
+  </systemProperty>
+  </systemProperties>
+  </configuration>
+    </plugin>
   </plugins>
   </build>
   <dependencies>
