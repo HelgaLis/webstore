@@ -13,6 +13,7 @@ import org.springframework.ui.Model;
 import org.springframework.util.StringUtils;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.WebDataBinder;
+import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.InitBinder;
 import org.springframework.web.bind.annotation.MatrixVariable;
 import org.springframework.web.bind.annotation.ModelAttribute;
@@ -21,8 +22,11 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.multipart.MultipartFile;
+import org.springframework.web.servlet.ModelAndView;
 
 import webstore.domain.Product;
+import webstore.exception.NoProductFoundUnderCategoryException;
+import webstore.exception.ProductNotFoundException;
 import webstore.service.ProductService;
 
 @Controller
@@ -56,7 +60,11 @@ public class ProductController {
 
 	@RequestMapping("products/{category}")
 	public String getsProductsByCategory(Model model, @PathVariable("category") String productCategory) {
-		model.addAttribute("products", productService.getProductsByCategory(productCategory));
+		List<Product> products = productService.getProductsByCategory(productCategory);
+		if(products == null || products.isEmpty()){
+			throw new NoProductFoundUnderCategoryException();
+		}
+		model.addAttribute("products", products);
 		return "products";
 	}
 
@@ -119,5 +127,14 @@ public class ProductController {
 		}
 		productService.addProduct(newProduct);
 		return "redirect:/market/products";
+	}
+	@ExceptionHandler(ProductNotFoundException.class)
+	public ModelAndView handleError(HttpServletRequest request, ProductNotFoundException exception){
+		ModelAndView mav = new ModelAndView();
+		mav.addObject("invalidProductId", exception.getProductId());
+		mav.addObject("exception", exception);
+		mav.addObject("url", request.getRequestURL()+"?"+request.getQueryString());
+		mav.setViewName("productNotFound");
+		return mav;
 	}
 }

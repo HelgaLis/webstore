@@ -8,22 +8,28 @@ import java.util.Map;
 import java.util.stream.Collectors;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.dao.DataAccessException;
 import org.springframework.jdbc.core.RowMapper;
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
 import org.springframework.stereotype.Repository;
 
 import webstore.domain.Product;
+import webstore.exception.ProductNotFoundException;
+
 @Repository
 public class InMemoryProductRepository implements ProductRepository {
 	@Autowired
 	private NamedParameterJdbcTemplate jdbcTemplate;
+
 	@Override
 	public List<Product> getllProducts() {
 		Map<String, Object> params = new HashMap<>();
-		List<Product> result = jdbcTemplate.query("SELECT * FROM products", params, new ProductMapper() );
+		List<Product> result = jdbcTemplate.query("SELECT * FROM products",
+				params, new ProductMapper());
 		return result;
 	}
-	private static final class ProductMapper implements RowMapper<Product>{
+
+	private static final class ProductMapper implements RowMapper<Product> {
 
 		@Override
 		public Product mapRow(ResultSet rs, int rowNum) throws SQLException {
@@ -40,8 +46,9 @@ public class InMemoryProductRepository implements ProductRepository {
 			product.setDiscontinued(rs.getBoolean("DISCONTINUED"));
 			return product;
 		}
-		
+
 	}
+
 	@Override
 	public void updateStock(String productId, long noOfUnits) {
 		String SQL = "UPDATE PRODUCTS SET UNITS_IN_STOCK=:unitsInStock WHERE ID=:id";
@@ -49,8 +56,9 @@ public class InMemoryProductRepository implements ProductRepository {
 		params.put("unitsInStock", noOfUnits);
 		params.put("id", productId);
 		jdbcTemplate.update(SQL, params);
-		
+
 	}
+
 	@Override
 	public List<Product> getProductsByCategory(String category) {
 		String sql = "SELECT * FROM PRODUCTS WHERE CATEGORY = :category";
@@ -58,27 +66,38 @@ public class InMemoryProductRepository implements ProductRepository {
 		params.put("category", category);
 		return jdbcTemplate.query(sql, params, new ProductMapper());
 	}
+
 	@Override
 	public List<String> getAllProductCategories() {
 		String sql = "SELECT DISTINCT * FROM products";
 		Map<String, Object> params = new HashMap<>();
-		List<Product> cats = jdbcTemplate.query(sql, params, new ProductMapper());
-		return cats.stream().map(p->p.getCategory()).collect(Collectors.toList());
+		List<Product> cats = jdbcTemplate.query(sql, params,
+				new ProductMapper());
+		return cats.stream().map(p -> p.getCategory())
+				.collect(Collectors.toList());
 	}
+
 	@Override
 	public List<Product> getPruductByFilter(
 			Map<String, List<String>> filterParams) {
 		String sql = "SELECT * FROM Products WHERE CATEGORY in (:categories) AND MANUFACTURER IN (:brands)";
-		
+
 		return jdbcTemplate.query(sql, filterParams, new ProductMapper());
 	}
+
 	@Override
 	public Product getProductById(String productId) {
 		String sql = "SELECT * FROM Products WHERE ID=:id";
 		Map<String, Object> params = new HashMap<String, Object>();
 		params.put("id", productId);
+		try{
 		return jdbcTemplate.queryForObject(sql, params, new ProductMapper());
+		}
+		catch(DataAccessException e){
+			throw new ProductNotFoundException(productId);
+		}
 	}
+
 	@Override
 	public List<Product> filterProducts(Map<String, Double> priceParams,
 			String category, String brand) {
@@ -89,10 +108,11 @@ public class InMemoryProductRepository implements ProductRepository {
 		params.putAll(priceParams);
 		return jdbcTemplate.query(sql, params, new ProductMapper());
 	}
+
 	@Override
 	public void addProduct(Product product) {
 		String sql = "INSERT INTO Products (ID, NAME, DESCRIPTION, UNIT_PRICE, MANUFACTURER, CATEGORY, CONDITION, UNITS_IN_STOCK, UNITS_IN_ORDER, DISCONTINUED)"
-				+" VALUES(:id,:name,:desc,:price,:manufacturer,:category,:condition,:inStock,:inOrder,:discontinued)";
+				+ " VALUES(:id,:name,:desc,:price,:manufacturer,:category,:condition,:inStock,:inOrder,:discontinued)";
 		System.out.println(product);
 		Map<String, Object> params = new HashMap<String, Object>();
 		params.put("id", product.getProductId());
@@ -106,7 +126,7 @@ public class InMemoryProductRepository implements ProductRepository {
 		params.put("inOrder", product.getUnitsInOrder());
 		params.put("discontinued", product.isDiscontinued());
 		jdbcTemplate.update(sql, params);
-		
+
 	}
 
 }
