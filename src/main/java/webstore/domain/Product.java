@@ -3,6 +3,8 @@ package webstore.domain;
 import java.io.Serializable;
 import java.math.BigDecimal;
 
+import org.springframework.web.multipart.MultipartFile;
+
 public class Product implements Serializable {
 
 
@@ -17,6 +19,8 @@ public class Product implements Serializable {
 	private long unitsInOrder;
 	private boolean discontinued;
 	private String condition;
+	private MultipartFile productImage;
+	private MultipartFile productManual;
 	public Product() {
 		super();
 		// TODO Auto-generated constructor stub
@@ -121,6 +125,18 @@ public class Product implements Serializable {
 				+ ", unitsInStock=" + unitsInStock + ", unitsInOrder="
 				+ unitsInOrder + ", discontinued=" + discontinued
 				+ ", condition=" + condition + "]";
+	}
+	public MultipartFile getProductImage() {
+		return productImage;
+	}
+	public void setProductImage(MultipartFile productImage) {
+		this.productImage = productImage;
+	}
+	public MultipartFile getProductManual() {
+		return productManual;
+	}
+	public void setProductManulal(MultipartFile productManual) {
+		this.productManual = productManual;
 	}
 	
 	
