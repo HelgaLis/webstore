@@ -43,11 +43,7 @@ public class ProductController {
 
 	@RequestMapping("/products")
 	public String list(Model model) {
-		/*
-		 * Product product = new Product("P1234","Ihpone6s",new BigDecimal(500));
-		 * product.setCategory("Smartphone"); product.setDescription("Very good phone");
-		 * product.setManufacturer("Apple"); product.setUnitsInStock(1000);
-		 */
+
 		model.addAttribute("products", productService.getAllProducts());
 		return "products";
 	}
