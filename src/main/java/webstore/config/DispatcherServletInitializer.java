@@ -1,7 +1,8 @@
 package webstore.config;
 
+import org.springframework.context.annotation.EnableAspectJAutoProxy;
 import org.springframework.web.servlet.support.AbstractAnnotationConfigDispatcherServletInitializer;
-
+//@EnableAspectJAutoProxy
 public class DispatcherServletInitializer extends AbstractAnnotationConfigDispatcherServletInitializer {
 
 	@Override

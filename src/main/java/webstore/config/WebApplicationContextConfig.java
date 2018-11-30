@@ -6,6 +6,7 @@ import org.springframework.context.MessageSource;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.context.annotation.EnableAspectJAutoProxy;
 import org.springframework.context.support.ResourceBundleMessageSource;
 import org.springframework.oxm.jaxb.Jaxb2Marshaller;
 import org.springframework.web.accept.ContentNegotiationManager;
@@ -14,6 +15,7 @@ import org.springframework.web.servlet.View;
 import org.springframework.web.servlet.ViewResolver;
 import org.springframework.web.servlet.config.annotation.DefaultServletHandlerConfigurer;
 import org.springframework.web.servlet.config.annotation.EnableWebMvc;
+import org.springframework.web.servlet.config.annotation.InterceptorRegistry;
 import org.springframework.web.servlet.config.annotation.PathMatchConfigurer;
 import org.springframework.web.servlet.config.annotation.ResourceHandlerRegistry;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurerAdapter;
@@ -25,14 +27,21 @@ import org.springframework.web.servlet.view.xml.MarshallingView;
 import org.springframework.web.util.UrlPathHelper;
 
 import webstore.domain.Product;
+import webstore.interceptor.RequestTimeHandlerAspect;
+import webstore.interceptor.RequestTimeLogInterceptor;
 
 @Configuration
 @EnableWebMvc
+@EnableAspectJAutoProxy
 @ComponentScan("webstore")
 public class WebApplicationContextConfig extends WebMvcConfigurerAdapter {
 	@Override
 	public void configureDefaultServletHandling(DefaultServletHandlerConfigurer configurer) {
 		configurer.enable();
+	}
+	@Bean
+	public RequestTimeHandlerAspect requestTimeHandlerAspect(){
+		return new RequestTimeHandlerAspect();
 	}
 	@Bean
 	public InternalResourceViewResolver getInternalResouerceViewResolver() {
@@ -59,6 +68,10 @@ public class WebApplicationContextConfig extends WebMvcConfigurerAdapter {
 		registry.addResourceHandler("/img/**").addResourceLocations("/resources/images/");
 		registry.addResourceHandler("/pdf/**").addResourceLocations("/recources/pdfs/");
 	}
+	@Override
+	public void addInterceptors(InterceptorRegistry registry) {
+		registry.addInterceptor(new RequestTimeLogInterceptor());
+	};
 	@Bean 
 	public MessageSource messageSource(){
 		ResourceBundleMessageSource resource = new ResourceBundleMessageSource();
